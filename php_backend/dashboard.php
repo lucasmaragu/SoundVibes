@@ -1,38 +1,52 @@
 <?php
+// Se incluye el controlador de usuario para realizar las operaciones CRUD
 require './controllers/UserController.php';
 
-
+// Inicia la sesión para verificar roles y manejar datos de sesión
 session_start();
 
+// Se crea una instancia del controlador de usuarios
 $userController = new UserController();
 
+/**
+ * Función para verificar si el usuario tiene un rol específico.
+ * 
+ * @param string $role - Rol a verificar (e.g., 'admin').
+ * @return bool - True si el rol coincide, False de lo contrario.
+ */
 function hasRole($role)
 {
     return isset($_SESSION['role']) && $_SESSION['role'] === $role;
 }
 
-
-
+// Verifica si el usuario no tiene el rol de admin y lo redirige a la página de inicio de sesión si es necesario
 if (!hasRole('admin')) {
-    header('Location: login.php');
-    exit();
+    header('Location: login.php'); // Redirige al login
+    exit(); // Detiene la ejecución del script
 }
 
-
+// Verifica si la solicitud HTTP es POST para manejar acciones como crear, actualizar, eliminar o cerrar sesión
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Crea un nuevo usuario
     if (isset($_POST['create'])) {
-        $userController->createUser($_POST['name'], $_POST['password']);
-    } elseif (isset($_POST['update'])) {
-        $userController->updateUser($_POST['id'], $_POST['new_name'], $_POST['new_password']);
-    } elseif (isset($_POST['delete'])) {
-        $userController->deleteUser($_POST['delete']);
-    } elseif (isset($_POST['logout'])) {
-        header('Location: logout.php');
+        $userController->createUser($_POST['name'], $_POST['password'], $_POST['role']);
+    }
+    // Actualiza un usuario existente
+    elseif (isset($_POST['update'])) {
+        $userController->updateUser($_POST['id'], $_POST['new_name'], $_POST['new_role'], $_POST['new_password']);
+    }
+    // Elimina un usuario existente
+    elseif (isset($_POST['delete'])) {
+        $userController->deleteUser($_POST['id']);
+    }
+    // Cierra la sesión
+    elseif (isset($_POST['logout'])) {
+        header('Location: logout.php'); // Redirige al script de cierre de sesión
         exit();
     }
 }
 
-
+// Lee todos los usuarios disponibles a través del controlador
 $users = $userController->readUsers();
 ?>
 
@@ -54,7 +68,7 @@ $users = $userController->readUsers();
                     <div class="relative flex h-16 items-center justify-between lg:border-b lg:border-indigo-400 lg:border-opacity-25">
                         <div class="flex items-center px-2 lg:px-0">
                             <form method="POST">
-                                <label for="logout">Cerrar Sesion</label>
+                                <label for="logout"></label>
                                 <button type="submit" name="logout" value="true" class="bg-red-800 rounded-lg py-2 px-4 text-sm text-white font-medium">
                                     Logout
                                 </button>
@@ -75,7 +89,7 @@ $users = $userController->readUsers();
                 <div class="rounded-lg bg-white px-5 py-6 shadow sm:px-6">
                     <div id="create" class="mb-12">
                         <h2 class="text-xl font-semibold mb-6">Create New User</h2>
-                        <form method="POST" class="space-y-4">
+                        <form id="createUserForm" method="POST" class="space-y-4">
                             <div>
                                 <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
                                 <input type="text" name="name" id="name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required>
@@ -85,7 +99,14 @@ $users = $userController->readUsers();
                                 <input type="password" name="password" id="password
                                 " class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required>
                             </div>
-                            
+                            <div>
+                                <select name="role" for="role">Rol
+                                    <option value="">Selecciona un Rol</option>
+                                    <option value="user">User</option>
+                                    <option value="admin">Admin</option>
+                                </select>
+                            </div>
+
                             <button type="submit" name="create" class="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">Create User</button>
                         </form>
                     </div>
@@ -120,9 +141,20 @@ $users = $userController->readUsers();
                                                             <?= htmlspecialchars($user['role'] ?? 'N/A') ?>
                                                         </td>
                                                         <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                                                            <button type="button" onclick="openUpdateForm('<?= htmlspecialchars($user['id'] ?? '') ?>', '<?= htmlspecialchars($user['username'] ?? '') ?>', '<?= htmlspecialchars($user['role'] ?? '') ?>')" class="text-indigo-600 hover:text-indigo-900">Edit</button>
-                                                            <a href="?delete=<?= htmlspecialchars($user['id'] ?? '') ?>" class="text-red-600 hover:text-red-900 ml-4" onclick="return confirm('Are you sure you want to delete this user?')">Delete</a>
+                                                            <form method="POST" action="" class="inline">
+                                                                <input type="hidden" name="id" value="<?= htmlspecialchars($user['id'] ?? '') ?>">
+                                                                <button type="submit" name="delete"
+                                                                    class="text-red-600 hover:text-red-900"
+                                                                    onclick="return confirm('Are you sure you want to delete this user?')">
+                                                                    Delete
+                                                                </button>
+                                                            </form>
+                                                            <button type="button" onclick="openUpdateForm('<?= htmlspecialchars($user['id'] ?? '') ?>', '<?= htmlspecialchars($user['username'] ?? '') ?>', '<?= htmlspecialchars($user['role'] ?? '') ?>')"
+                                                                class="text-indigo-600 hover:text-indigo-900 ml-4">
+                                                                Edit
+                                                            </button>
                                                         </td>
+
                                                     </tr>
                                                 <?php endforeach; ?>
                                             </tbody>
@@ -138,42 +170,63 @@ $users = $userController->readUsers();
     </div>
 
     <div id="updateModal" class="hidden fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center">
-        <div class="bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:max-w-lg sm:w-full sm:p-6">
-            <div>
-                <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Update User</h3>
-                <form method="POST">
-                    <input type="hidden" name="id" id="updateId">
-                    <div class="mb-4">
-                        <label for="updateName" class="block text-sm font-medium text-gray-700">Name</label>
-                        <input type="text" name="new_name" id="updateName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required>
-                    </div>
-                    <div class="mb-4 w-full">
-                        <select>Rol
+    <div class="bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:max-w-lg sm:w-full sm:p-6">
+        <div>
+            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Update User</h3>
+            <form method="POST">
+                <input type="hidden" name="id" id="updateId">
+                <div class="mb-4">
+                    <label for="new_name" class="block text-sm font-medium text-gray-700">Name</label>
+                    <input type="text" name="new_name" id="updateName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required>
+                </div>
+                <div class="mb-4">
+                    <label for="new_password" class="block text-sm font-medium text-gray-700">Password</label>
+                    <input type="text" name="new_password" id="updatePassword" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required>
+                </div>
+                <div class="mb-4 w-full">
+                    <select name="new_role" id="updateRole" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required>
                         <option value="">Selecciona un Rol</option>
                         <option value="user">User</option>
-                        <option value="admin">Admin</option></select>
-                    </div>
-                    <div class="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
-                        <button type="submit" name="update" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:col-start-2 sm:text-sm">Update User</button>
-                        <button type="button" onclick="closeUpdateForm()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:col-start-1 sm:text-sm">Cancel</button>
-                    </div>
-                </form>
-            </div>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+                <div class="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
+                    <button type="submit" name="update" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:col-start-2 sm:text-sm">Update User</button>
+                    <button type="button" onclick="closeUpdateForm()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:col-start-1 sm:text-sm">Cancel</button>
+                </div>
+            </form>
         </div>
     </div>
+</div>
 
-    <script>
-        function openUpdateForm(id, username) {
-            document.getElementById('updateId').value = id;
-            document.getElementById('updateName').value = username;
-            document.getElementById('updateModal').classList.remove('hidden');
+<script>
+function openUpdateForm(id, username, role) {
+    document.getElementById('updateId').value = id;
+    document.getElementById('updateName').value = username;
+    document.getElementById('updatePassword').value = password;  
+    document.getElementById('updateRole').value = role;
+    document.getElementById('updateModal').classList.remove('hidden');
 }
 
+function closeUpdateForm() {
+    document.getElementById('updateModal').classList.add('hidden');
+}
+</script>
 
-        function closeUpdateForm() {
-            document.getElementById('updateModal').classList.add('hidden');
-        }
-    </script>
+
+    <script>
+function openUpdateForm(id, username, role) {
+    document.getElementById('updateId').value = id;
+    document.getElementById('updateName').value = username;
+    document.getElementById('updatePassword').value = '';  // Add default empty password
+    document.getElementById('updateRole').value = role;
+    document.getElementById('updateModal').classList.remove('hidden');
+}
+
+function closeUpdateForm() {
+    document.getElementById('updateModal').classList.add('hidden');
+}
+</script>
 </body>
 
 </html>

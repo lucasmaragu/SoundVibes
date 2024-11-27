@@ -7,21 +7,9 @@
             "role": "admin"
         },
         {
-            "id": 2,
+            "id":2,
             "username": "user",
             "password": "user123",
-            "role": "user"
-        },
-        {
-            "id": 3,
-            "username": "Lucas",
-            "password": "lucas123",
-            "role": "user"
-        },
-        {
-            "id": 4,
-            "username": "Sergi",
-            "password": "admin",
             "role": "user"
         }
     ]

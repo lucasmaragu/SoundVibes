@@ -1,0 +1,15 @@
+# Node.js
+node_modules/
+
+# Logs
+*.log
+
+# .env files
+.env
+
+# Docker
+.docker/
+
+# Archivos de sistema
+.DS_Store
+    

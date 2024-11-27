@@ -1,5 +1,0 @@
-<?php
-
-echo "User page";
-
-?>

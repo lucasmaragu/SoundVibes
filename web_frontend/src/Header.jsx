@@ -1,12 +1,15 @@
-import React from 'react';
+
+import { LogoutButton }  from './components/LogoutButton';
+
 
 export const Header = ({ mood, onMoodChange }) => {
   const moods = ['Triste', 'Feliz', 'Energético', 'Relax'];
 
   return (
     <header className="w-full h-16 bg-black text-white flex items-center">
-      <div className="flex items-center mx-5">
+      <div className="flex items-center flex-row gap-x-5 mx-5">
         <img className="p-2 m-5 h-14" src="/assets/spotify_logo.png" alt="spotify-logo" />
+        <LogoutButton />
       </div>
       <div className=" w-2/4 flex justify-center items-center mx-auto">
         <div className="flex items-center gap-2">
