@@ -31,9 +31,11 @@ Este es un proyecto fullstack que utiliza Docker y Docker Compose para crear un 
    Para poder acceder, existen dos usuarios:
 
    **Admin**
+   
    Username: admin
    Password: admin123
 
    **User**
+   
    Username: user
    Password: user123
