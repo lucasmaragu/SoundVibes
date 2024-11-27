@@ -1,6 +1,6 @@
-# Mi Proyecto con Docker y Docker Compose
+# SPOTIFY LOGIN
 
-Este es un proyecto que utiliza Docker y Docker Compose para crear un entorno de desarrollo que incluye un backend en PHP con un CRUD y un frontend en React para un clon de Spotify con un selector de canciones segun el mood. Este README te guiará para ejecutar el proyecto en tu máquina local.
+Este es un proyecto fullstack que utiliza Docker y Docker Compose para crear un entorno de desarrollo que incluye un backend en PHP con un CRUD y un frontend en React para un clon de Spotify con un selector de canciones segun el mood. Este README te guiará para ejecutar el proyecto en tu máquina local.
 
 ## Requisitos
 
@@ -11,8 +11,8 @@ Este es un proyecto que utiliza Docker y Docker Compose para crear un entorno de
 1. **Clona el repositorio**:
 
    ```bash
-   git clone https://github.com/usuario/mi-proyecto.git
-   cd mi-proyecto
+   git clone https://github.com/Luxark03014/Spotify-Login
+   cd Spotify-Login
 
 2. **Construye y ejecuta los contenedores con Docker Compose:**
 
