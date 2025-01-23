@@ -1,4 +1,4 @@
-# SPOTIFY LOGIN
+# SoundVibes
 
 Este es un proyecto fullstack que utiliza Docker y Docker Compose para crear un entorno de desarrollo que incluye un backend en PHP con un CRUD y un frontend en React para un clon de Spotify con un selector de canciones segun el mood. Este README te guiará para ejecutar el proyecto en tu máquina local.
 
