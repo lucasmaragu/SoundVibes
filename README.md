@@ -11,7 +11,7 @@ Este es un proyecto fullstack que utiliza Docker y Docker Compose para crear un 
 1. **Clona el repositorio**:
 
    ```bash
-   git clone https://github.com/Luxark03014/Spotify-Login
+   git clone https://github.com/lucasmaragu/SoundVibes
    cd Spotify-Login
 
 2. **Construye y ejecuta los contenedores con Docker Compose:**
